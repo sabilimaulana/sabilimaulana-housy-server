@@ -1,6 +1,7 @@
 const db = require("../models");
 const { Property, City } = require("../models");
 
+// Get All Houses
 exports.getAllProperties = (req, res) => {
   db.Property.findAll({ include: City })
     .then((result) => {
@@ -9,6 +10,7 @@ exports.getAllProperties = (req, res) => {
     .catch((error) => res.status(404).json(error));
 };
 
+// Get one house with id
 exports.getProperty = (req, res) => {
   const { id } = req.params;
 
@@ -28,6 +30,8 @@ exports.getProperty = (req, res) => {
   });
 };
 
+// Untuk menghapus property berdasarkan id
+// Mengapa kita perlu request body jika kita hanya perlu id?
 exports.deleteProperty = (req, res) => {
   const { id } = req.params;
 
@@ -41,8 +45,8 @@ exports.deleteProperty = (req, res) => {
   }
 };
 
-//res.send(result) nya belom dihandle
-
+// Untuk mengedit property berdasarkan id
+// dengan body berbentuk JSON
 exports.updateProperty = (req, res) => {
   const { id } = req.params;
 
@@ -93,6 +97,8 @@ exports.updateProperty = (req, res) => {
     });
 };
 
+// Untuk menambah property
+// dengan body berupa multipart form
 exports.addProperty = (req, res) => {
   const {
     propertyName,
