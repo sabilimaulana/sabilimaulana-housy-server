@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 
 const router = Router();
 
-const checkAuth = require("../../middleware/check-auth.js");
+const checkAuth = require("../middleware/check-auth");
 
 const multer = require("multer");
 const { route } = require("./user");
@@ -17,7 +17,7 @@ const {
   deleteProperty,
   updateProperty,
   addProperty,
-} = require("../../controllers/property.js");
+} = require("../controllers/property.js");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

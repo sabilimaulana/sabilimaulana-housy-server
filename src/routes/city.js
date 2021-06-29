@@ -4,7 +4,7 @@ const { City } = require("../models");
 
 const router = Router();
 
-const checkAuth = require("../../middleware/check-auth.js");
+const checkAuth = require("../middleware/check-auth.js");
 
 const multer = require("multer");
 
