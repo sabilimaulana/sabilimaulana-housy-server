@@ -4,14 +4,14 @@ const app = express();
 const bodyParser = require("body-parser");
 const PORT = process.env.PORT || 8080;
 const cors = require("cors");
-const user = require("./routes/user.js");
-const property = require("./routes/property.js");
-const city = require("./routes/city");
+const user = require("./src/routes/user.js");
+const property = require("./src/routes/property.js");
+const city = require("./src/routes/city");
 // const { Property } = require("./models");
 // const City = require("./models/City.js");
 
-const db = require("./models");
-const router = require("./routes/user.js");
+const db = require("./src/models");
+const router = require("./src/routes/user.js");
 // const { User } = require("./models");
 
 // Property.hasOne(City);
