@@ -3,95 +3,29 @@ const bodyParser = require("body-parser");
 const db = require("../models");
 const { User } = require("../models");
 const jwt = require("jsonwebtoken");
-const { Op } = require("sequelize");
 
 // Harusnya ini ada di .env
-const JWT_KEY = "secret";
 
 const router = Router();
+
+const {
+  signin,
+  signup,
+  getAllUsers,
+  deleteUser,
+} = require("../controllers/user");
 
 // router.get("/get-users", (req, res) => {
 //   db.User.findAll().then((users) => res.send(users));
 // });
 
-router.post("/signin", (req, res) => {
-  const { username, password } = req.body;
+router.post("/signin", signin);
 
-  db.User.findOne({
-    where: {
-      username,
-      password,
-    },
-  }).then((result) => {
-    if (result) {
-      const token = jwt.sign({ username }, JWT_KEY, {
-        expiresIn: "1h",
-      });
-      res.status(200).json({
-        data: { username, token },
-      });
-    } else {
-      res.status(401).json({ message: "Data doesn't match with the database" });
-    }
-  });
-});
+router.post("/signup", signup);
 
-router.post("/signup", (req, res) => {
-  const {
-    username,
-    password,
-    fullname,
-    email,
-    address,
-    status,
-    gender,
-    phone,
-  } = req.body;
+router.get("/users", getAllUsers);
 
-  if (
-    !username ||
-    !password ||
-    !fullname ||
-    !email ||
-    !address ||
-    !status ||
-    !gender ||
-    !phone
-  ) {
-    res.status(400).json({ message: "Failed add user, Uncomplete body" });
-    return;
-  }
-
-  db.User.findOne({
-    where: {
-      [Op.or]: [{ username }, { email }],
-    },
-  }).then((result) => {
-    if (result) {
-      res.status(401).json({ message: "Username or email is already exist" });
-    } else {
-      const token = jwt.sign({ username, email }, JWT_KEY, { expiresIn: "1h" });
-
-      User.create({
-        username,
-        password,
-        fullname,
-        email,
-        address,
-        status,
-        gender,
-        phone,
-      });
-      res.status(200).json({
-        message: "Add user to database successfully",
-        data: {
-          username,
-          token,
-        },
-      });
-    }
-  });
-});
+router.delete("/user/:id", deleteUser);
 
 // app.get("/insert", (req, res) => {
 //   User.create({
