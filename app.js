@@ -7,6 +7,8 @@ const cors = require("cors");
 const user = require("./src/routes/user.js");
 const property = require("./src/routes/property.js");
 const city = require("./src/routes/city");
+const transaction = require("./src/routes/transaction");
+
 // const { Property } = require("./models");
 // const City = require("./models/City.js");
 
@@ -24,6 +26,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/v1/", user);
 app.use("/api/v1/", city);
 app.use("/api/v1/", property);
+app.use("/api/v1/", transaction);
 
 db.sequelize.sync().then((req) => {
   app.listen(PORT, () => {

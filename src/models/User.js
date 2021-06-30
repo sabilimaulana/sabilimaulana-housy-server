@@ -61,5 +61,10 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: "",
     },
   });
+
+  User.associate = (models) => {
+    User.hasOne(models.Transaction, { foreignKey: "userId" }); // If only one portfolio per user
+  };
+
   return User;
 };

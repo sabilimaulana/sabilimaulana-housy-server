@@ -32,24 +32,6 @@ exports.signin = async (req, res) => {
       .status(500)
       .json({ status: "Failed", message: "Internal server error", error });
   }
-
-  // db.User.findOne({
-  //   where: {
-  //     username,
-  //     password,
-  //   },
-  // }).then((result) => {
-  //   if (result) {
-  //     const token = jwt.sign({ username }, JWT_KEY, {
-  //       expiresIn: "1h",
-  //     });
-  //     res.status(200).json({
-  //       data: { username, token },
-  //     });
-  //   } else {
-  //     res.status(401).json({ message: "Data doesn't match with the database" });
-  //   }
-  // });
 };
 
 exports.signup = async (req, res) => {

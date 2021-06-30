@@ -9,10 +9,44 @@ exports.getAllProperties = async (req, res) => {
         model: City,
         attributes: { exclude: ["createdAt", "updatedAt"] },
       },
-      attributes: { exclude: ["createdAt", "updatedAt"] },
+      attributes: { exclude: ["createdAt", "updatedAt", "cityId"] },
     });
 
-    res.send(result);
+    res
+      .status(200)
+      .json({ message: "Get all properties successfully", data: result });
+
+    // Jika ingin membuat amenities menjadi format array
+    // const newResult = await result.map((property, index) => {
+    //   let newProperty = {
+    //     propertyName: property.propertyName,
+    //     address: property.address,
+    //     yearPrice: property.yearPrice,
+    //     monthPrice: property.monthPrice,
+    //     dayPrice: property.dayPrice,
+    //     bedroom: property.bedroom,
+    //     bathroom: property.bathroom,
+    //     area: property.area,
+    //     amenities: [],
+    //     City: property.City,
+    //   };
+    //   const amenities = [];
+    //   if (property.furnished === "true") {
+    //     newProperty.amenities.push("Furnished");
+    //   }
+    //   if (property.petAllowed === "true") {
+    //     newProperty.amenities.push("Pet Allowed");
+    //   }
+    //   if (property.sharedAccomodation === "true") {
+    //     newProperty.amenities.push("Shared Accomodation");
+    //   }
+    //   property.amenities = amenities;
+    //   return newProperty;
+    // });
+
+    // res
+    //   .status(200)
+    //   .json({ message: "Get all properties successfully", data: newResult });
   } catch (error) {
     res
       .status(500)
@@ -54,27 +88,6 @@ exports.getProperty = async (req, res) => {
       .status(500)
       .json({ status: "Failed", message: "Internal server error", error });
   }
-
-  // db.Property.findOne({
-  //   where: {
-  //     id,
-  //   },
-  // })
-  //   .then((result) => {
-  //     if (!result) {
-  //       res.status(400).json({
-  //         message:
-  //           "Get property detail by id is failed because id doesn't exist",
-  //       });
-  //     }
-  //     res.status(200).json({
-  //       message: "Get property detail by id succesfully",
-  //       data: result,
-  //     });
-  //   })
-  //   .catch((error) => {
-  //     res.status(500).json({ error });
-  //   });
 };
 
 // Untuk menghapus property berdasarkan id
@@ -109,33 +122,6 @@ exports.deleteProperty = async (req, res) => {
       .status(500)
       .json({ status: "Failed", message: "Internal server error", error });
   }
-
-  // db.Property.findOne({
-  //   where: {
-  //     id,
-  //   },
-  // })
-  //   .then((result) => {
-  //     if (!result) {
-  //       res.status(400).json({
-  //         message: `Delete property by id is failed because id: ${id} doesn't exist`,
-  //       });
-  //     } else {
-  //       try {
-  //         db.Property.destroy({
-  //           where: { id },
-  //         });
-  //         res
-  //           .status(200)
-  //           .json({ message: `Delete property by id: ${id} successfully` });
-  //       } catch (error) {
-  //         res.send(error);
-  //       }
-  //     }
-  //   })
-  //   .catch((error) => {
-  //     res.status(500).json({ error });
-  //   });
 };
 
 // Untuk mengedit property berdasarkan id
@@ -182,69 +168,28 @@ exports.updateProperty = async (req, res) => {
     } else {
       db.Property.findOne({
         where: { id },
-      }).then((result) => {
-        res
-          .status(200)
-          .json({
+      })
+        .then((result) => {
+          res.status(200).json({
             message: `Property with id ${id} has been updated`,
             data: result,
-          })
-          .catch((error) => {
-            res.status(400).json({ error });
           });
-      });
+        })
+        .catch((error) => {
+          res
+            .status(500)
+            .json({
+              status: "Failed",
+              message: "Internal server error",
+              error,
+            });
+        });
     }
   } catch (error) {
     res
       .status(500)
       .json({ status: "Failed", message: "Internal server error", error });
   }
-
-  ///
-
-  ///
-
-  ///
-
-  // db.Property.update(
-  //   {
-  //     propertyName,
-  //     cityId,
-  //     address,
-  //     yearPrice,
-  //     monthPrice,
-  //     dayPrice,
-  //     furnished,
-  //     petAllowed,
-  //     sharedAccomodation,
-  //     bedroom,
-  //     bathroom,
-  //     area,
-  //   },
-  //   { where: { id } }
-  // )
-  //   .then((result) => {
-  //     if (result[0] === 0) {
-  //       res.status(400).json({ message: "Id property is doesn't exist" });
-  //     } else {
-  //       db.Property.findOne({
-  //         where: { id },
-  //       }).then((result) => {
-  //         res
-  //           .status(200)
-  //           .json({
-  //             message: `Property with id ${id} has been updated`,
-  //             data: result,
-  //           })
-  //           .catch((error) => {
-  //             res.status(400).json({ error });
-  //           });
-  //       });
-  //     }
-  //   })
-  //   .catch((error) => {
-  //     res.status(400).json(error);
-  //   });
 };
 
 // Untuk menambah property

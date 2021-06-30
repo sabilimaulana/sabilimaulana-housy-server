@@ -1,15 +1,9 @@
 const { Router } = require("express");
-const db = require("../models");
-const { Property, City } = require("../models");
-
-const bodyParser = require("body-parser");
+const multer = require("multer");
 
 const router = Router();
 
 const checkAuth = require("../middleware/check-auth");
-
-const multer = require("multer");
-const { route } = require("./user");
 
 const {
   getAllProperties,
