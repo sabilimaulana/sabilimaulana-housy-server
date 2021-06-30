@@ -1,3 +1,4 @@
+const { authProperty } = require("../helpers/authSchema");
 const db = require("../models");
 const { Property, City } = require("../models");
 
@@ -52,15 +53,6 @@ exports.getAllProperties = async (req, res) => {
       .status(500)
       .json({ status: "Failed", message: "Internal server error", error });
   }
-
-  // db.Property.findAll({
-  //   include: City,
-  //   attributes: { exclude: ["createdAt", "updatedAt"] },
-  // })
-  //   .then((result) => {
-  //     res.send(result);
-  //   })
-  //   .catch((error) => res.status(404).json(error));
 };
 
 // Get one house with id
@@ -176,13 +168,11 @@ exports.updateProperty = async (req, res) => {
           });
         })
         .catch((error) => {
-          res
-            .status(500)
-            .json({
-              status: "Failed",
-              message: "Internal server error",
-              error,
-            });
+          res.status(500).json({
+            status: "Failed",
+            message: "Internal server error",
+            error,
+          });
         });
     }
   } catch (error) {
@@ -195,91 +185,75 @@ exports.updateProperty = async (req, res) => {
 // Untuk menambah property
 // dengan body berupa multipart form
 exports.addProperty = async (req, res) => {
-  const {
-    propertyName,
-    cityId,
-    address,
-    yearPrice,
-    monthPrice,
-    dayPrice,
-    furnished,
-    petAllowed,
-    sharedAccomodation,
-    bedroom,
-    bathroom,
-    area,
-  } = req.body;
+  // if (
+  //   !propertyName ||
+  //   !cityId ||
+  //   !address ||
+  //   !yearPrice ||
+  //   !monthPrice ||
+  //   !dayPrice ||
+  //   !furnished ||
+  //   !petAllowed ||
+  //   !sharedAccomodation ||
+  //   !bedroom ||
+  //   !bathroom ||
+  //   !area
+  // ) {
+  //   res
+  //     .status(400)
+  //     .json({ message: "Uncomplete body request for add-property" });
+  // }
 
-  if (
-    !propertyName ||
-    !cityId ||
-    !address ||
-    !yearPrice ||
-    !monthPrice ||
-    !dayPrice ||
-    !furnished ||
-    !petAllowed ||
-    !sharedAccomodation ||
-    !bedroom ||
-    !bathroom ||
-    !area
-  ) {
-    res
-      .status(401)
-      .json({ message: "Uncomplete body request for add-property" });
-  } else {
-    try {
-      const result = await Property.create({
-        propertyName,
-        cityId,
-        address,
-        yearPrice,
-        monthPrice,
-        dayPrice,
-        furnished,
-        petAllowed,
-        sharedAccomodation,
-        bedroom,
-        bathroom,
-        area,
-        urlFirstImage: req.files[0]?.path,
-        urlSecondImage: req.files[1]?.path,
-        urlThirdImage: req.files[2]?.path,
-        urlFourthImage: req.files[3]?.path,
-      });
+  // else {
+  try {
+    const {
+      propertyName,
+      cityId,
+      address,
+      yearPrice,
+      monthPrice,
+      dayPrice,
+      furnished,
+      petAllowed,
+      sharedAccomodation,
+      bedroom,
+      bathroom,
+      area,
+    } = req.body;
 
-      res.status(200).json({
-        message: "Add property to database successfully",
-        data: result,
-      });
-    } catch (error) {
+    const propertyValidate = await authProperty.validateAsync(req.body);
+
+    const result = await Property.create({
+      propertyName,
+      cityId,
+      address,
+      yearPrice,
+      monthPrice,
+      dayPrice,
+      furnished,
+      petAllowed,
+      sharedAccomodation,
+      bedroom,
+      bathroom,
+      area,
+      urlFirstImage: req.files[0]?.path,
+      urlSecondImage: req.files[1]?.path,
+      urlThirdImage: req.files[2]?.path,
+      urlFourthImage: req.files[3]?.path,
+    });
+
+    res.status(200).json({
+      message: "Add property to database successfully",
+      data: result,
+    });
+  } catch (error) {
+    if (error.isJoi) {
+      res.status(422).json({ error });
+    } else {
       res
         .status(500)
         .json({ status: "Failed", message: "Internal server error", error });
     }
-
-    // Property.create({
-    //   propertyName,
-    //   cityId,
-    //   address,
-    //   yearPrice,
-    //   monthPrice,
-    //   dayPrice,
-    //   furnished,
-    //   petAllowed,
-    //   sharedAccomodation,
-    //   bedroom,
-    //   bathroom,
-    //   area,
-    //   urlFirstImage: req.files[0]?.path,
-    //   urlSecondImage: req.files[1]?.path,
-    //   urlThirdImage: req.files[2]?.path,
-    //   urlFourthImage: req.files[3]?.path,
-    // }).then((result) => {
-    //   res.status(200).json({
-    //     message: "Add property to database successfully",
-    //     data: result,
-    //   });
-    // });
   }
+  // }
 };

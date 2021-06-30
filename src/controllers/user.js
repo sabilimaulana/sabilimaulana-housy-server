@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const { Op } = require("sequelize");
 
 const JWT_KEY = "secret";
+const { authUser } = require("../helpers/authSchema");
 
 exports.signin = async (req, res) => {
   const { username, password } = req.body;
@@ -35,32 +36,34 @@ exports.signin = async (req, res) => {
 };
 
 exports.signup = async (req, res) => {
-  const {
-    username,
-    password,
-    fullname,
-    email,
-    address,
-    status,
-    gender,
-    phone,
-  } = req.body;
-
-  if (
-    !username ||
-    !password ||
-    !fullname ||
-    !email ||
-    !address ||
-    !status ||
-    !gender ||
-    !phone
-  ) {
-    res.status(400).json({ message: "Failed add user, Uncomplete body" });
-    return;
-  }
-
   try {
+    const userValidate = await authUser.validateAsync(req.body);
+
+    const {
+      username,
+      password,
+      fullname,
+      email,
+      address,
+      status,
+      gender,
+      phone,
+    } = req.body;
+
+    // if (
+    //   !username ||
+    //   !password ||
+    //   !fullname ||
+    //   !email ||
+    //   !address ||
+    //   !status ||
+    //   !gender ||
+    //   !phone
+    // ) {
+    //   res.status(400).json({ message: "Failed add user, Uncomplete body" });
+    //   return;
+    // }
+
     const result = await db.User.findOne({
       where: {
         [Op.or]: [{ username }, { email }],
@@ -91,40 +94,14 @@ exports.signup = async (req, res) => {
       });
     }
   } catch (error) {
-    res
-      .status(500)
-      .json({ status: "Failed", message: "Internal server error", error });
+    if (error.isJoi === true) {
+      res.status(422).json({ error });
+    } else {
+      res
+        .status(500)
+        .json({ status: "Failed", message: "Internal server error", error });
+    }
   }
-
-  // db.User.findOne({
-  //   where: {
-  //     [Op.or]: [{ username }, { email }],
-  //   },
-  // }).then((result) => {
-  //   if (result) {
-  //     res.status(401).json({ message: "Username or email is already exist" });
-  //   } else {
-  //     const token = jwt.sign({ username, email }, JWT_KEY, { expiresIn: "1h" });
-
-  //     User.create({
-  //       username,
-  //       password,
-  //       fullname,
-  //       email,
-  //       address,
-  //       status,
-  //       gender,
-  //       phone,
-  //     });
-  //     res.status(200).json({
-  //       message: "Add user to database successfully",
-  //       data: {
-  //         username,
-  //         token,
-  //       },
-  //     });
-  //   }
-  // });
 };
 
 exports.getAllUsers = async (req, res) => {
@@ -183,37 +160,4 @@ exports.deleteUser = async (req, res) => {
       .status(500)
       .json({ status: "Failed", message: "Internal server error", error });
   }
-
-  // db.User.findOne({
-  //   where: {
-  //     id,
-  //   },
-  // })
-  //   .then((result) => {
-  //     if (!result) {
-  //       res.status(400).json({
-  //         message: `Delete user by id is failed because user with id: ${id} doesn't exist`,
-  //       });
-  //     } else {
-  //       try {
-  //         db.User.destroy({
-  //           where: { id },
-  //         });
-  //         res
-  //           .status(200)
-  //           .json({ message: `Delete user by id: ${id} successfully` });
-  //       } catch (error) {
-  //         res.status(500).json({
-  //           status: "Failed",
-  //           message: "Internal server error",
-  //           error,
-  //         });
-  //       }
-  //     }
-  //   })
-  //   .catch((error) => {
-  //     res
-  //       .status(500)
-  //       .json({ status: "Failed", message: "Internal server error", error });
-  //   });
 };

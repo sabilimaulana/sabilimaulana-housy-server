@@ -1,19 +1,22 @@
+const { authTransaction } = require("../helpers/authSchema");
 const db = require("../models");
 const { Property, City, Transaction, User } = require("../models");
 
 exports.addTransaction = async (req, res) => {
-  const {
-    checkin,
-    checkout,
-    total,
-    status,
-    propertyId,
-    userId,
-    attachment,
-    duration,
-  } = req.body;
-
   try {
+    const transactionValidate = await authTransaction.validateAsync(req.body);
+    console.log(transactionValidate);
+    const {
+      checkin,
+      checkout,
+      total,
+      status,
+      propertyId,
+      userId,
+      attachment,
+      duration,
+    } = req.body;
+
     const result = await Transaction.create({
       checkin,
       checkout,
@@ -45,9 +48,13 @@ exports.addTransaction = async (req, res) => {
       data: resultAftedCreated,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ status: "Failed", message: "Internal server error", error });
+    if (error.isJoi) {
+      res.status(422).json({ error });
+    } else {
+      res
+        .status(500)
+        .json({ status: "Failed", message: "Internal server error", error });
+    }
   }
 };
 
