@@ -9,12 +9,7 @@ const property = require("./src/routes/property.js");
 const city = require("./src/routes/city");
 const transaction = require("./src/routes/transaction");
 
-// const { Property } = require("./models");
-// const City = require("./models/City.js");
-
 const db = require("./src/models");
-const router = require("./src/routes/user.js");
-// const { User } = require("./models");
 
 // Property.hasOne(City);
 
@@ -79,4 +74,4 @@ db.sequelize.sync().then((req) => {
 //   });
 // });
 
-module.exports = router;
+// module.exports = router;

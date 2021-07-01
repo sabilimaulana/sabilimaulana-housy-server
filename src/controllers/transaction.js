@@ -1,6 +1,8 @@
 const { authTransaction } = require("../helpers/authSchema");
 const db = require("../models");
 const { Property, City, Transaction, User } = require("../models");
+const router = require("../routes/user");
+const { Op } = require("sequelize");
 
 exports.addTransaction = async (req, res) => {
   try {
@@ -49,7 +51,7 @@ exports.addTransaction = async (req, res) => {
     });
   } catch (error) {
     if (error.isJoi) {
-      res.status(422).json({ error });
+      res.status(422).json({ error: error.details[0].message });
     } else {
       res
         .status(500)
@@ -196,6 +198,55 @@ exports.getTransactionById = async (req, res) => {
     }
     res.status(200).json({
       message: "Get transaction detail by id succesfully",
+      data: result,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ status: "Failed", message: "Internal server error", error });
+  }
+};
+
+// Opsional
+exports.getOrder = async (req, res) => {
+  try {
+    const { userId } = req;
+
+    const result = await db.Transaction.findAll({
+      where: {
+        userId,
+        [Op.or]: [{ status: "Waiting Payment" }, { status: "Waiting Approve" }],
+      },
+    });
+
+    console.log(result);
+
+    return res.status(200).json({
+      message: `Get order with user id: ${userId} successfully`,
+      data: result,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ status: "Failed", message: "Internal server error", error });
+  }
+};
+
+exports.getHistory = async (req, res) => {
+  try {
+    const { userId } = req;
+
+    const result = await db.Transaction.findAll({
+      where: {
+        userId,
+        [Op.or]: [{ status: "Cancel" }, { status: "Approved" }],
+      },
+    });
+
+    console.log(result);
+
+    return res.status(200).json({
+      message: `Get history with user id: ${userId} successfully`,
       data: result,
     });
   } catch (error) {

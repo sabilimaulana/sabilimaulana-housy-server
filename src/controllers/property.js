@@ -4,54 +4,86 @@ const { Property, City } = require("../models");
 
 // Get All Houses
 exports.getAllProperties = async (req, res) => {
-  try {
-    const result = await db.Property.findAll({
-      include: {
-        model: City,
-        attributes: { exclude: ["createdAt", "updatedAt"] },
-      },
-      attributes: { exclude: ["createdAt", "updatedAt", "cityId"] },
-    });
+  //baru selesai membuat multiple query filter, tinggal bikin yang single query filter
+  if (req.query) {
+    try {
+      const result = await db.Property.findAll({
+        include: {
+          model: City,
+          attributes: { exclude: ["createdAt", "updatedAt"] },
+        },
+        attributes: { exclude: ["createdAt", "updatedAt", "cityId"] },
+      });
 
-    res
-      .status(200)
-      .json({ message: "Get all properties successfully", data: result });
+      if (req.query.belowYearPrice && req.query.belowArea) {
+        const newResult = result.filter((property) => {
+          if (
+            parseInt(property.yearPrice) <=
+              parseInt(req.query.belowYearPrice) &&
+            parseInt(property.area) <= parseInt(req.query.belowArea)
+          ) {
+            return true;
+          }
+        });
 
-    // Jika ingin membuat amenities menjadi format array
-    // const newResult = await result.map((property, index) => {
-    //   let newProperty = {
-    //     propertyName: property.propertyName,
-    //     address: property.address,
-    //     yearPrice: property.yearPrice,
-    //     monthPrice: property.monthPrice,
-    //     dayPrice: property.dayPrice,
-    //     bedroom: property.bedroom,
-    //     bathroom: property.bathroom,
-    //     area: property.area,
-    //     amenities: [],
-    //     City: property.City,
-    //   };
-    //   const amenities = [];
-    //   if (property.furnished === "true") {
-    //     newProperty.amenities.push("Furnished");
-    //   }
-    //   if (property.petAllowed === "true") {
-    //     newProperty.amenities.push("Pet Allowed");
-    //   }
-    //   if (property.sharedAccomodation === "true") {
-    //     newProperty.amenities.push("Shared Accomodation");
-    //   }
-    //   property.amenities = amenities;
-    //   return newProperty;
-    // });
+        res.send(newResult);
+      }
+      res.send(result);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ status: "Failed", message: "Internal server error", error });
+    }
+  } else {
+    try {
+      const result = await db.Property.findAll({
+        include: {
+          model: City,
+          attributes: { exclude: ["createdAt", "updatedAt"] },
+        },
+        attributes: { exclude: ["createdAt", "updatedAt", "cityId"] },
+      });
 
-    // res
-    //   .status(200)
-    //   .json({ message: "Get all properties successfully", data: newResult });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ status: "Failed", message: "Internal server error", error });
+      res
+        .status(200)
+        .json({ message: "Get all properties successfully", data: result });
+
+      // Jika ingin membuat amenities menjadi format array
+      // const newResult = await result.map((property, index) => {
+      //   let newProperty = {
+      //     propertyName: property.propertyName,
+      //     address: property.address,
+      //     yearPrice: property.yearPrice,
+      //     monthPrice: property.monthPrice,
+      //     dayPrice: property.dayPrice,
+      //     bedroom: property.bedroom,
+      //     bathroom: property.bathroom,
+      //     area: property.area,
+      //     amenities: [],
+      //     City: property.City,
+      //   };
+      //   const amenities = [];
+      //   if (property.furnished === "true") {
+      //     newProperty.amenities.push("Furnished");
+      //   }
+      //   if (property.petAllowed === "true") {
+      //     newProperty.amenities.push("Pet Allowed");
+      //   }
+      //   if (property.sharedAccomodation === "true") {
+      //     newProperty.amenities.push("Shared Accomodation");
+      //   }
+      //   property.amenities = amenities;
+      //   return newProperty;
+      // });
+
+      // res
+      //   .status(200)
+      //   .json({ message: "Get all properties successfully", data: newResult });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ status: "Failed", message: "Internal server error", error });
+    }
   }
 };
 
@@ -185,26 +217,6 @@ exports.updateProperty = async (req, res) => {
 // Untuk menambah property
 // dengan body berupa multipart form
 exports.addProperty = async (req, res) => {
-  // if (
-  //   !propertyName ||
-  //   !cityId ||
-  //   !address ||
-  //   !yearPrice ||
-  //   !monthPrice ||
-  //   !dayPrice ||
-  //   !furnished ||
-  //   !petAllowed ||
-  //   !sharedAccomodation ||
-  //   !bedroom ||
-  //   !bathroom ||
-  //   !area
-  // ) {
-  //   res
-  //     .status(400)
-  //     .json({ message: "Uncomplete body request for add-property" });
-  // }
-
-  // else {
   try {
     const {
       propertyName,
@@ -248,7 +260,7 @@ exports.addProperty = async (req, res) => {
     });
   } catch (error) {
     if (error.isJoi) {
-      res.status(422).json({ error });
+      res.status(422).json({ error: error.details[0].message });
     } else {
       res
         .status(500)

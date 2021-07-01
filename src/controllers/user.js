@@ -1,7 +1,7 @@
 const db = require("../models");
 const { User } = require("../models");
 const jwt = require("jsonwebtoken");
-
+const bcrypt = require("bcrypt");
 const { Op } = require("sequelize");
 
 const JWT_KEY = "secret";
@@ -14,12 +14,19 @@ exports.signin = async (req, res) => {
     const result = await db.User.findOne({
       where: {
         username,
-        password,
       },
     });
 
     if (result) {
-      const token = jwt.sign({ username }, JWT_KEY, {
+      const isValidPassword = await bcrypt.compare(password, result.password);
+      if (!isValidPassword) {
+        return res.send({
+          status: "failed",
+          massage: "Email or Password dont match",
+        });
+      }
+
+      const token = jwt.sign({ username, id: result.id }, JWT_KEY, {
         expiresIn: "1h",
       });
       res.status(200).json({
@@ -50,19 +57,8 @@ exports.signup = async (req, res) => {
       phone,
     } = req.body;
 
-    // if (
-    //   !username ||
-    //   !password ||
-    //   !fullname ||
-    //   !email ||
-    //   !address ||
-    //   !status ||
-    //   !gender ||
-    //   !phone
-    // ) {
-    //   res.status(400).json({ message: "Failed add user, Uncomplete body" });
-    //   return;
-    // }
+    const hashStrenght = 10;
+    const hashedPassword = await bcrypt.hash(password, hashStrenght);
 
     const result = await db.User.findOne({
       where: {
@@ -73,29 +69,33 @@ exports.signup = async (req, res) => {
     if (result) {
       res.status(401).json({ message: "Username or email is already exist" });
     } else {
-      const token = jwt.sign({ username, email }, JWT_KEY, { expiresIn: "1h" });
-
       User.create({
         username,
-        password,
+        password: hashedPassword,
         fullname,
         email,
         address,
         status,
         gender,
         phone,
-      });
-      res.status(200).json({
-        message: "Add user to database successfully",
-        data: {
-          username,
-          token,
-        },
+      }).then((result) => {
+        // console.log(result);
+        const token = jwt.sign({ username, email, id: result.id }, JWT_KEY, {
+          expiresIn: "1h",
+        });
+
+        res.status(200).json({
+          message: "Add user to database successfully",
+          data: {
+            username,
+            token,
+          },
+        });
       });
     }
   } catch (error) {
     if (error.isJoi === true) {
-      res.status(422).json({ error });
+      res.status(422).json({ error: error.details[0].message });
     } else {
       res
         .status(500)
@@ -117,14 +117,6 @@ exports.getAllUsers = async (req, res) => {
       .status(500)
       .json({ status: "Failed", message: "Internal server error", error });
   }
-
-  // db.User.findAll({ attributes: { exclude: ["createdAt", "updatedAt"] } }).then(
-  //   (result) => {
-  //     res
-  //       .status(200)
-  //       .json({ message: "Get all data users successfully", data: result });
-  //   }
-  // );
 };
 
 exports.deleteUser = async (req, res) => {
@@ -154,6 +146,82 @@ exports.deleteUser = async (req, res) => {
           .status(500)
           .json({ status: "Failed", message: "Internal server error", error });
       }
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ status: "Failed", message: "Internal server error", error });
+  }
+};
+
+// Opsional
+exports.getProfile = async (req, res) => {
+  try {
+    const result = await db.User.findOne({
+      where: { id: req.userId },
+      attributes: { exclude: ["createdAt", "updatedAt", "password"] },
+    });
+
+    if (result) {
+      return res
+        .status(200)
+        .json({ message: "Get profile data successfully", data: result });
+    } else {
+      return res.status(400).json({ message: "Get profile failed" });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ status: "Failed", message: "Internal server error", error });
+  }
+};
+
+exports.getUserByUsername = async (req, res) => {
+  try {
+    const { username } = req.body;
+
+    const result = await db.User.findOne({
+      where: { username },
+      attributes: { exclude: ["createdAt", "updatedAt", "password"] },
+    });
+
+    if (!result) {
+      res.status(400).json({
+        status: "Failed",
+        message: `User with username: ${username} doesn't exist`,
+      });
+    } else {
+      res.status(200).json({
+        message: "Get user detail by username successfully",
+        data: result,
+      });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ status: "Failed", message: "Internal server error", error });
+  }
+};
+
+exports.updateProfilePicture = async (req, res) => {
+  console.log(req.file);
+  try {
+    const { id } = req.params;
+
+    const result = db.User.update(
+      { urlImage: req.file.path },
+      { where: { id } }
+    );
+
+    if (result[0] === 0) {
+      res.status(400).json({ message: `User with id: ${id} doesn't exist` });
+    } else {
+      db.User.findOne({ where: { id } }).then((result) => {
+        res.status(200).json({
+          message: "Update profile picture successfully",
+          data: result,
+        });
+      });
     }
   } catch (error) {
     res
