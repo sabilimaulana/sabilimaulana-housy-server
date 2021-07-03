@@ -3,8 +3,10 @@ const { User } = require("../models");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { Op } = require("sequelize");
+require("dotenv").config();
 
-const JWT_KEY = "secret";
+const JWT_KEY = process.env.JWT_KEY;
+
 const { authUser } = require("../helpers/authSchema");
 
 exports.signin = async (req, res) => {
@@ -30,10 +32,14 @@ exports.signin = async (req, res) => {
         expiresIn: "1h",
       });
       res.status(200).json({
-        data: { username, token },
+        username,
+        token,
       });
     } else {
-      res.status(401).json({ message: "Data doesn't match with the database" });
+      res.status(200).json({
+        status: "Failed",
+        message: "Data doesn't match with the database",
+      });
     }
   } catch (error) {
     res
@@ -204,19 +210,21 @@ exports.getUserByUsername = async (req, res) => {
 };
 
 exports.updateProfilePicture = async (req, res) => {
-  console.log(req.file);
+  // console.log(req.file);
   try {
-    const { id } = req.params;
+    const { userId } = req;
 
     const result = db.User.update(
       { urlImage: req.file.path },
-      { where: { id } }
+      { where: { id: userId } }
     );
 
     if (result[0] === 0) {
-      res.status(400).json({ message: `User with id: ${id} doesn't exist` });
+      res
+        .status(400)
+        .json({ message: `User with id: ${userId} doesn't exist` });
     } else {
-      db.User.findOne({ where: { id } }).then((result) => {
+      db.User.findOne({ where: { id: userId } }).then((result) => {
         res.status(200).json({
           message: "Update profile picture successfully",
           data: result,

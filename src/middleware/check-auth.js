@@ -1,17 +1,19 @@
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
-const JWT_KEY = "secret";
+const JWT_KEY = process.env.JWT_KEY;
 
 module.exports = (req, res, next) => {
   try {
+    console.log(JWT_KEY);
+    // Untuk memisahkan 'Bearer' dan 'token'
     const token = req.headers.authorization.split(" ")[1];
-    // console.log(token);
     const decoded = jwt.verify(token, JWT_KEY);
-    // console.log(decoded);
-    // req.userData = decoded;
+
+    // Meneruskan id user untuk dipakai di controllers
     req.userId = decoded.id;
     next();
   } catch (error) {
-    return res.status(401).json({ message: "Auth Failed" });
+    res.status(401).json({ message: "Auth Failed" });
   }
 };

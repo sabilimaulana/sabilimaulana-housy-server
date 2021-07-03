@@ -11,8 +11,6 @@ const transaction = require("./src/routes/transaction");
 
 const db = require("./src/models");
 
-// Property.hasOne(City);
-
 app.use(bodyParser.json());
 app.use(cors());
 app.use("/uploads", express.static("uploads"));
@@ -28,50 +26,3 @@ db.sequelize.sync().then((req) => {
     console.log("App is running on localhost on ", PORT);
   });
 });
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-///
-///
-
-// app.post("/", (req, res) => {
-//   console.log(req.body);
-//   res.send("test");
-// });
-
-// app.get("/api", (req, res) => {
-//   res.status(200).json({ message: "Get api success" });
-// });
-
-// app.get("/insert", (req, res) => {
-//   User.create({
-//     username: "owner",
-//     password: "12345678",
-//     fullname: "Owner Fullname",
-//     email: "owner@gmail.com",
-//     address: "Kemang, Jakarta Selatan",
-//     status: "Owner",
-//     gender: "Female",
-//     phone: "081234567890",
-//   }).catch((error) => {
-//     if (error) {
-//       console.log(error);
-//     }
-//   });
-// });
-
-// module.exports = router;

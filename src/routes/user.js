@@ -46,43 +46,16 @@ router.get("/users", getAllUsers);
 
 router.delete("/user/:id", deleteUser);
 
+// Opsional
 router.get("/user/username", getUserByUsername);
 
 router.patch(
-  "/user/profile-picture/:id",
+  "/user/profile-picture/",
+  checkAuth,
   upload.single("profilePicture"),
   updateProfilePicture
 );
 
 router.get("/user/profile", checkAuth, getProfile);
-// app.get("/insert", (req, res) => {
-//   User.create({
-//     username: "owner",
-//     password: "12345678",
-//     fullname: "Owner Fullname",
-//     email: "owner@gmail.com",
-//     address: "Kemang, Jakarta Selatan",
-//     status: "Owner",
-//     gender: "Female",
-//     phone: "081234567890",
-//   }).catch((error) => {
-//     if (error) {
-//       console.log(error);
-//     }
-//   });
-// });
-
-// const { getUsers } = require("../controllers/users/index");
-
-// router.get("/get-users", getUsers);
-
-// router.post("/add-user", (req, res) => {
-
-// });
-
-// export const addUser = async (req, res) => {
-//   console.log(req.body);
-//   res.send("test");
-// };
 
 module.exports = router;

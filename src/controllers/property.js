@@ -2,10 +2,13 @@ const { authProperty } = require("../helpers/authSchema");
 const db = require("../models");
 const { Property, City } = require("../models");
 
+require("dotenv").config();
+
+const BASE_URL = process.env.BASE_URL;
 // Get All Houses
 exports.getAllProperties = async (req, res) => {
   //baru selesai membuat multiple query filter, tinggal bikin yang single query filter
-  if (req.query) {
+  if (Object.keys(req.query).length > 0) {
     try {
       const result = await db.Property.findAll({
         include: {
@@ -44,9 +47,27 @@ exports.getAllProperties = async (req, res) => {
         attributes: { exclude: ["createdAt", "updatedAt", "cityId"] },
       });
 
+      // Menambahkan base url kepada path gambar rumah
+      const newResult = result.map((property) => {
+        if (property.urlFirstImage) {
+          property.urlFirstImage = BASE_URL + property.urlFirstImage;
+        }
+        if (property.urlSecondImage) {
+          property.urlSecondImage = BASE_URL + property.urlSecondImage;
+        }
+        if (property.urlThirdImage) {
+          property.urlThirdImage = BASE_URL + property.urlThirdImage;
+        }
+        if (property.urlFourthImage) {
+          property.urlFourthImage = BASE_URL + property.urlFourthImage;
+        }
+
+        return property;
+      });
+
       res
         .status(200)
-        .json({ message: "Get all properties successfully", data: result });
+        .json({ message: "Get all properties successfully", data: newResult });
 
       // Jika ingin membuat amenities menjadi format array
       // const newResult = await result.map((property, index) => {
