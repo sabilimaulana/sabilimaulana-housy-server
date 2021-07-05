@@ -5,7 +5,7 @@ const JWT_KEY = process.env.JWT_KEY;
 
 module.exports = (req, res, next) => {
   try {
-    console.log(JWT_KEY);
+    console.log(req.headers.authorization);
     // Untuk memisahkan 'Bearer' dan 'token'
     const token = req.headers.authorization.split(" ")[1];
     const decoded = jwt.verify(token, JWT_KEY);

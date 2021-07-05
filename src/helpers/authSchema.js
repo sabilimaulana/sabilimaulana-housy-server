@@ -7,7 +7,7 @@ exports.authUser = Joi.object({
   fullname: Joi.string().required(),
   email: Joi.string().email().required(),
   address: Joi.string().required(),
-  status: Joi.string().required(),
+  listAs: Joi.string().required(),
   gender: Joi.string().required(),
   phone: Joi.string().required(),
 });

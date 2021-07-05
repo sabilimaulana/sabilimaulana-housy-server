@@ -36,7 +36,7 @@ exports.signin = async (req, res) => {
         token,
       });
     } else {
-      res.status(200).json({
+      res.status(401).json({
         status: "Failed",
         message: "Data doesn't match with the database",
       });
@@ -58,7 +58,7 @@ exports.signup = async (req, res) => {
       fullname,
       email,
       address,
-      status,
+      listAs,
       gender,
       phone,
     } = req.body;
@@ -81,7 +81,7 @@ exports.signup = async (req, res) => {
         fullname,
         email,
         address,
-        status,
+        listAs,
         gender,
         phone,
       }).then((result) => {
@@ -169,6 +169,15 @@ exports.getProfile = async (req, res) => {
     });
 
     if (result) {
+      console.log(result);
+      if (result.urlImage !== "") {
+        result.urlImage = process.env.BASE_URL + result.urlImage;
+      }
+      // const newResult = result.map((profile) => {
+      //   // profile.urlImage = process.env.BASE_URL + profile.urlImage;
+      //   return profile;
+      // });
+      // console.log(newResult);
       return res
         .status(200)
         .json({ message: "Get profile data successfully", data: result });

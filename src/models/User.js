@@ -35,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
         notEmpty: true,
       },
     },
-    status: {
+    listAs: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
