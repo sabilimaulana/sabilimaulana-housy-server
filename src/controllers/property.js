@@ -120,9 +120,22 @@ exports.getProperty = async (req, res) => {
     });
 
     if (!result) {
-      res.status(400).json({
+      return res.status(400).json({
         message: "Get property detail by id is failed because id doesn't exist",
       });
+    }
+
+    if (result.urlFirstImage) {
+      result.urlFirstImage = BASE_URL + result.urlFirstImage;
+    }
+    if (result.urlSecondImage) {
+      result.urlSecondImage = BASE_URL + result.urlSecondImage;
+    }
+    if (result.urlThirdImage) {
+      result.urlThirdImage = BASE_URL + result.urlThirdImage;
+    }
+    if (result.urlFourthImage) {
+      result.urlFourthImage = BASE_URL + result.urlFourthImage;
     }
     res.status(200).json({
       message: "Get property detail by id succesfully",
@@ -138,6 +151,17 @@ exports.getProperty = async (req, res) => {
 // Untuk menghapus property berdasarkan id
 // Mengapa kita perlu request body jika kita hanya perlu id?
 exports.deleteProperty = async (req, res) => {
+  const { userId } = req;
+
+  const checkListAs = await db.User.findOne({ where: { id: userId } });
+
+  if (checkListAs.listAs === "Tenant") {
+    return res.status(401).json({
+      status: "Failed",
+      message: "Add property failed because you're not the Owner",
+    });
+  }
+
   const { id } = req.params;
 
   try {
@@ -172,6 +196,17 @@ exports.deleteProperty = async (req, res) => {
 // Untuk mengedit property berdasarkan id
 // dengan body berbentuk JSON
 exports.updateProperty = async (req, res) => {
+  const { userId } = req;
+
+  const checkListAs = await db.User.findOne({ where: { id: userId } });
+
+  if (checkListAs.listAs === "Tenant") {
+    return res.status(401).json({
+      status: "Failed",
+      message: "Add property failed because you're not the Owner",
+    });
+  }
+
   const { id } = req.params;
 
   const {
@@ -238,6 +273,17 @@ exports.updateProperty = async (req, res) => {
 // Untuk menambah property
 // dengan body berupa multipart form
 exports.addProperty = async (req, res) => {
+  const { userId } = req;
+
+  const checkListAs = await db.User.findOne({ where: { id: userId } });
+
+  if (checkListAs.listAs === "Tenant") {
+    return res.status(401).json({
+      status: "Failed",
+      message: "Add property failed because you're not the Owner",
+    });
+  }
+
   try {
     const {
       propertyName,

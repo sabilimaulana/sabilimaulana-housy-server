@@ -25,6 +25,7 @@ exports.authProperty = Joi.object({
   bedroom: Joi.number().required(),
   bathroom: Joi.number().required(),
   area: Joi.number().required(),
+  uploadedImages: Joi.optional(),
 });
 
 exports.authTransaction = Joi.object({
