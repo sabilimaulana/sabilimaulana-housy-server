@@ -101,6 +101,8 @@ module.exports = (sequelize, DataTypes) => {
   Property.associate = (models) => {
     Property.belongsTo(models.City, { foreignKey: "cityId" }); // If only one portfolio per user
     Property.hasOne(models.Transaction, { foreignKey: "propertyId" });
+    Property.belongsTo(models.User, { foreignKey: "ownerId" }); // If only one portfolio per user
+
     // Proper.hasOne(models.Property, { foreignKey: "cityId" }); // If only one portfolio per user
     // If only one portfolio per user
   };

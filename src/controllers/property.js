@@ -212,6 +212,7 @@ exports.updateProperty = async (req, res) => {
   const {
     propertyName,
     cityId,
+    ownerId,
     address,
     yearPrice,
     monthPrice,
@@ -229,6 +230,7 @@ exports.updateProperty = async (req, res) => {
       {
         propertyName,
         cityId,
+        ownerId,
         address,
         yearPrice,
         monthPrice,
@@ -288,6 +290,7 @@ exports.addProperty = async (req, res) => {
     const {
       propertyName,
       cityId,
+      ownerId,
       address,
       yearPrice,
       monthPrice,
@@ -305,6 +308,7 @@ exports.addProperty = async (req, res) => {
     const result = await Property.create({
       propertyName,
       cityId,
+      ownerId,
       address,
       yearPrice,
       monthPrice,

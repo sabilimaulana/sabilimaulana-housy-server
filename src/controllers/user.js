@@ -24,7 +24,7 @@ exports.signin = async (req, res) => {
       if (!isValidPassword) {
         return res.send({
           status: "failed",
-          massage: "Email or Password dont match",
+          message: "Email or Password dont match",
         });
       }
 
@@ -169,7 +169,7 @@ exports.getProfile = async (req, res) => {
     });
 
     if (result) {
-      console.log(result);
+      // console.log(result);
       if (result.urlImage !== "") {
         result.urlImage = process.env.BASE_URL + result.urlImage;
       }
@@ -219,7 +219,6 @@ exports.getUserByUsername = async (req, res) => {
 };
 
 exports.updateProfilePicture = async (req, res) => {
-  // console.log(req.file);
   try {
     const { userId } = req;
 
@@ -239,6 +238,54 @@ exports.updateProfilePicture = async (req, res) => {
           data: result,
         });
       });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ status: "Failed", message: "Internal server error", error });
+  }
+};
+
+exports.changePassword = async (req, res) => {
+  try {
+    const { userId } = req;
+    const { oldPassword, newPassword } = req.body;
+
+    const result = await User.findOne({ where: { id: userId } });
+
+    if (!result) {
+      return res.status(400).json({
+        status: "Failed",
+        message: "Change password failed because id doesn't exist",
+      });
+    } else {
+      const isValidOldPassword = await bcrypt.compare(
+        oldPassword,
+        result.password
+      );
+
+      if (!isValidOldPassword) {
+        return res.status(400).json({
+          status: "Failed",
+          message: "Change password failed because old password is wrong",
+        });
+      } else {
+        if (oldPassword === newPassword) {
+          return res.status(400).json({
+            status: "Failed",
+            message:
+              "Change password failed because old password and new password are same",
+          });
+        }
+
+        const hashStrenght = 10;
+        const hashedNewPassword = await bcrypt.hash(newPassword, hashStrenght);
+        User.update({ password: hashedNewPassword }, { where: { id: userId } });
+
+        return res
+          .status(200)
+          .json({ status: "Success", message: "Change password successfully" });
+      }
     }
   } catch (error) {
     res

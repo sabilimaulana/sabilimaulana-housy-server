@@ -17,6 +17,7 @@ const {
   getUserByUsername,
   updateProfilePicture,
   getProfile,
+  changePassword,
 } = require("../controllers/user");
 const checkAuth = require("../middleware/check-auth");
 
@@ -57,5 +58,7 @@ router.patch(
 );
 
 router.get("/user/profile", checkAuth, getProfile);
+
+router.patch("/user/change-password", checkAuth, changePassword);
 
 module.exports = router;

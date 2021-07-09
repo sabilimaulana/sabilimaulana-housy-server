@@ -15,6 +15,8 @@ exports.authUser = Joi.object({
 exports.authProperty = Joi.object({
   propertyName: Joi.string().required(),
   cityId: Joi.number().required(),
+  ownerId: Joi.number().required(),
+
   address: Joi.string().required(),
   yearPrice: Joi.number().required(),
   monthPrice: Joi.number().required(),
@@ -34,6 +36,8 @@ exports.authTransaction = Joi.object({
   total: Joi.number().required(),
   propertyId: Joi.number().required(),
   userId: Joi.number().required(),
+  ownerId: Joi.number().required(),
+
   duration: Joi.string().required(),
   status: Joi.string(),
   attachment: Joi.string(),
