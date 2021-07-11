@@ -223,6 +223,7 @@ exports.updateProperty = async (req, res) => {
     bedroom,
     bathroom,
     area,
+    description,
   } = req.body;
 
   try {
@@ -241,6 +242,7 @@ exports.updateProperty = async (req, res) => {
         bedroom,
         bathroom,
         area,
+        description,
       },
       { where: { id } }
     );
@@ -301,6 +303,7 @@ exports.addProperty = async (req, res) => {
       bedroom,
       bathroom,
       area,
+      description,
     } = req.body;
 
     const propertyValidate = await authProperty.validateAsync(req.body);
@@ -319,6 +322,7 @@ exports.addProperty = async (req, res) => {
       bedroom,
       bathroom,
       area,
+      description,
       urlFirstImage: req.files[0]?.path,
       urlSecondImage: req.files[1]?.path,
       urlThirdImage: req.files[2]?.path,
