@@ -83,7 +83,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(1500),
       defaultValue: "",
     },
-
     urlFirstImage: {
       type: DataTypes.STRING,
       defaultValue: "",

@@ -117,6 +117,9 @@ exports.getProperty = async (req, res) => {
       where: {
         id,
       },
+      include: [
+        { model: City, attributes: { exclude: ["createdAt", "updatedAt"] } },
+      ],
     });
 
     if (!result) {
